@@ -5,30 +5,76 @@ import { validate } from "class-validator";
 import { user } from "../entities/user";
 import config from "../config/config";
 import { hashPassword, checkIfUnencryptedPasswordIsValid } from "../utils";
-
-
+import { UserService } from "../services";
 
 class AuthController {
   static login = async (req: Request, res: Response) => {
     //Check if username and password are set
-    let { username, password } = req.body;
-    if (!(username && password)) {
-      res.status(400).send();
+    let { fbToken, googleToken, linkedinToken, email, password } = req.body;
+
+    const loginWithSocial = fbToken || googleToken || linkedinToken;
+    const loginWithEmail = !!password;
+
+    if (
+      (!loginWithEmail && !loginWithEmail) ||
+      (loginWithEmail && loginWithEmail)
+    ) {
+      res.status(400).json({ error: "Bad request" }); //TODO: locale support
+    }
+    if (loginWithEmail && !email) {
+      res.status(400).json({ error: "Email is empty" });
     }
 
     //Get user from database
-    const userRepository = getRepository(user);
-    let foundUser: user;
-    try {
-      foundUser = await userRepository.findOneOrFail({ where: { username } });
-    } catch (error) {
-      res.status(401).send();
-    }
 
-    //Check if encrypted password match
-    if (!checkIfUnencryptedPasswordIsValid(password, foundUser.password)) {
-      res.status(401).send();
-      return;
+    let foundUser: user;
+
+    if (loginWithEmail) {
+      try {
+        foundUser = await UserService.getUserByEmail(email);
+      } catch (error) {
+        res.status(401).send();
+      }
+
+      //Check if encrypted password match
+      if (!checkIfUnencryptedPasswordIsValid(password, foundUser.password)) {
+        res.status(401).send();
+        return;
+      }
+    } else if (loginWithSocial) {
+      //TODO: implement login with social
+      let newUser;
+      if (fbToken) {
+        //TODO: resolve facebook id from token
+        const fbId = "123123";
+        try {
+          foundUser = await UserService.getUserByFBId(fbId);
+        } catch {
+          //New user
+        }
+      } else if (googleToken) {
+        //TODO: resolve facebook id from token
+        const googleId = "123123";
+        try {
+          foundUser = await UserService.getUserByGoogleId(googleId);
+        } catch {
+          //New user
+        }
+      } else if (linkedinToken) {
+        //TODO: resolve facebook id from token
+        const linkedinId = "123123";
+        try {
+          foundUser = await UserService.getUserByLinkedinId(linkedinId);
+        } catch {
+          //New user
+          await UserService.addUser(newUser);
+        }
+      }
+      if (newUser) {
+        //Add new user
+
+        foundUser = newUser;
+      }
     }
 
     //Sing JWT, valid for 1 hour
@@ -39,7 +85,7 @@ class AuthController {
     );
 
     //Send the jwt in the response
-    res.send(token);
+    res.send({ user: foundUser, token });
   };
 
   static changePassword = async (req: Request, res: Response) => {
