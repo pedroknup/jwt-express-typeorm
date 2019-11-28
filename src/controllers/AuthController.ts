@@ -16,8 +16,8 @@ class AuthController {
     const loginWithEmail = !!password;
 
     if (
-      (!loginWithEmail && !loginWithEmail) ||
-      (loginWithEmail && loginWithEmail)
+      (!loginWithEmail && !loginWithSocial) ||
+      (loginWithEmail && loginWithSocial)
     ) {
       res.status(400).json({ error: "Bad request" }); //TODO: locale support
     }

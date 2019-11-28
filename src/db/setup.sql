@@ -160,3 +160,5 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'facebook', '418130689072157');
 INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'linkedin', '');
 INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'google', '923738134391-1fvtviaiprlche13vepf2cdb7ht6hagq.apps.googleusercontent.com');
+
+INSERT INTO `pk-boilerplate`.`user` (`id`, `firstName`, `lastName`, `email`, `password`, `createdAt`, `statusId`, `roleId`) VALUES ('1', 'Admin', 'Admin', 'admin@admin.com', '$2a$08$qFvXV8hTfEdaI3smfJRqse21bxmxWXM1u/cBBhziLXSRSejfJKMKW', '2019-11-28 19:50:40', '1', '2');
