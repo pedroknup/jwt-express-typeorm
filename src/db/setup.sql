@@ -36,7 +36,13 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`role` (
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
+INSERT INTO `pk-boilerplate`.`role` (`name`) VALUES ('user');
+INSERT INTO `pk-boilerplate`.`role` (`name`) VALUES ('admin');
 
+INSERT INTO `pk-boilerplate`.`user_status` (`id`, `name`) VALUES (NULL, 'activated');
+INSERT INTO `pk-boilerplate`.`user_status` (`id`, `name`) VALUES (NULL, 'pendent');
+INSERT INTO `pk-boilerplate`.`user_status` (`id`, `name`) VALUES (NULL, 'deactivated');
+INSERT INTO `pk-boilerplate`.`user_status` (`id`, `name`) VALUES (NULL, 'banned');
 -- -----------------------------------------------------
 -- Table `pk-boilerplate`.`user`
 -- -----------------------------------------------------
@@ -48,11 +54,11 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`user` (
   `password` VARCHAR(196) NULL DEFAULT NULL,
   `createdAt` DATETIME NOT NULL DEFAULT NOW(),
   `profilePic` VARCHAR(96) NULL,
-  `statusId` INT NOT NULL,
-  `roleId` INT NOT NULL,
+  `statusId` INT NOT NULL DEFAULT 2,
+  `roleId` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
-  INDEX `status-id_idx` (`statusId` ASC) VISIBLE,
-  INDEX `user-role-id_idx` (`roleId` ASC) VISIBLE,
+  INDEX `status-id_idx` (`statusId` ASC),
+  INDEX `user-role-id_idx` (`roleId` ASC),
   CONSTRAINT `user-status-id`
     FOREIGN KEY (`statusId`)
     REFERENCES `pk-boilerplate`.`user_status` (`id`)
@@ -63,23 +69,6 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`user` (
     REFERENCES `pk-boilerplate`.`role` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
-
-
--- -----------------------------------------------------
--- Table `pk-boilerplate`.`record`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`record` (
-  `idRecord` INT(11) NOT NULL AUTO_INCREMENT,
-  `idUser` INT(11) NOT NULL,
-  `hashId` VARCHAR(18) NOT NULL,
-  `publicURL` VARCHAR(70) NULL DEFAULT NULL,
-  PRIMARY KEY (`idRecord`),
-  INDEX `recordUser_idx` (`idUser` ASC) VISIBLE,
-  CONSTRAINT `recordUser`
-    FOREIGN KEY (`idUser`)
-    REFERENCES `pk-boilerplate`.`user` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
@@ -108,8 +97,8 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`user_external_login` (
   `loginProviderId` INT NOT NULL,
   `createdAt` DATETIME NOT NULL DEFAULT NOW(),
   PRIMARY KEY (`id`),
-  INDEX `user-external-login-id_idx` (`userId` ASC) VISIBLE,
-  INDEX `login-provider-id_idx` (`loginProviderId` ASC) VISIBLE,
+  INDEX `user-external-login-id_idx` (`userId` ASC),
+  INDEX `login-provider-id_idx` (`loginProviderId` ASC),
   CONSTRAINT `provider-user-external-login-id`
     FOREIGN KEY (`userId`)
     REFERENCES `pk-boilerplate`.`user` (`id`)
@@ -134,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`todo` (
   `createdAt` DATETIME NULL DEFAULT NOW(),
   `userId` INT NULL,
   PRIMARY KEY (`id`),
-  INDEX `todo-user-id_idx` (`userId` ASC) VISIBLE,
+  INDEX `todo-user-id_idx` (`userId` ASC),
   CONSTRAINT `todo-user-id`
     FOREIGN KEY (`userId`)
     REFERENCES `pk-boilerplate`.`user` (`id`)
@@ -153,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `pk-boilerplate`.`forgot_password` (
   `createdAt` DATETIME NULL DEFAULT NOW(),
   `expiresAt` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `forgot-user-id_idx` (`userId` ASC) VISIBLE,
+  INDEX `forgot-user-id_idx` (`userId` ASC),
   CONSTRAINT `forgot-user-id`
     FOREIGN KEY (`userId`)
     REFERENCES `pk-boilerplate`.`user` (`id`)
@@ -165,3 +154,9 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+
+INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'facebook', '418130689072157');
+INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'linkedin', '');
+INSERT INTO `pk-boilerplate`.`login_provider` (`id`, `name`, `appId`) VALUES (NULL, 'google', '923738134391-1fvtviaiprlche13vepf2cdb7ht6hagq.apps.googleusercontent.com');

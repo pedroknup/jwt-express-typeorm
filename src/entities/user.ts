@@ -2,7 +2,6 @@ import {BaseEntity,Column,Entity,Index,JoinColumn,JoinTable,ManyToMany,ManyToOne
 import {user_status} from "./user_status";
 import {role} from "./role";
 import {forgot_password} from "./forgot_password";
-import {record} from "./record";
 import {todo} from "./todo";
 import {user_external_login} from "./user_external_login";
 
@@ -82,11 +81,6 @@ export class user {
    
     @OneToMany(()=>forgot_password, (forgot_password: forgot_password)=>forgot_password.user,{ onDelete: 'NO ACTION' ,onUpdate: 'NO ACTION' })
     forgotPasswords:forgot_password[];
-    
-
-   
-    @OneToMany(()=>record, (record: record)=>record.idUser,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
-    records:record[];
     
 
    
