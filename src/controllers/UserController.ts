@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 
-import { User } from "../entity/User";
+import { user } from "../entities/User";
 
 class UserController{
 
 static listAll = async (req: Request, res: Response) => {
   //Get users from database
-  const userRepository = getRepository(User);
+  const userRepository = getRepository(user);
   const users = await userRepository.find({
-    select: ["id", "username", "role"] //We dont want to send the passwords on response
+    select: ["id", "email", "role"] //We dont want to send the passwords on response
   });
 
   //Send the users object
@@ -23,12 +23,10 @@ static getOneById = async (req: Request, res: Response) => {
   const id: number = req.params.id;
 
   //Get the user from database
-  const userRepository = getRepository(User);
+  const userRepository = getRepository(user);
   try {
-    const user = await userRepository.findOneOrFail(id, {
-      select: ["id", "username", "role"] //We dont want to send the password on response
-    });
-    res.send(user);
+    const foundUser = await userRepository.findOneOrFail(id);
+    res.send(foundUser);
   } catch (error) {
     res.status(404).send("User not found");
   }
@@ -36,26 +34,26 @@ static getOneById = async (req: Request, res: Response) => {
 
 static newUser = async (req: Request, res: Response) => {
   //Get parameters from the body
-  let { username, password, role } = req.body;
-  let user = new User();
-  user.username = username;
-  user.password = password;
-  user.role = role;
+  let { email, password, role } = req.body;
+  let newUser = new user();
+  newUser.email = email;
+  newUser.password = password;
+  newUser.role = role;
 
   //Validade if the parameters are ok
-  const errors = await validate(user);
+  const errors = await validate(newUser);
   if (errors.length > 0) {
     res.status(400).send(errors);
     return;
   }
 
   //Hash the password, to securely store on DB
-  user.hashPassword();
+  // newUser.hashPassword();
 
   //Try to save. If fails, the username is already in use
-  const userRepository = getRepository(User);
+  const userRepository = getRepository(user);
   try {
-    await userRepository.save(user);
+    await userRepository.save(newUser);
   } catch (e) {
     res.status(409).send("username already in use");
     return;
@@ -73,10 +71,10 @@ static editUser = async (req: Request, res: Response) => {
   const { username, role } = req.body;
 
   //Try to find user on database
-  const userRepository = getRepository(User);
-  let user;
+  const userRepository = getRepository(user);
+  let foundUser;
   try {
-    user = await userRepository.findOneOrFail(id);
+    foundUser = await userRepository.findOneOrFail(id);
   } catch (error) {
     //If not found, send a 404 response
     res.status(404).send("User not found");
@@ -84,9 +82,9 @@ static editUser = async (req: Request, res: Response) => {
   }
 
   //Validate the new values on model
-  user.username = username;
-  user.role = role;
-  const errors = await validate(user);
+  foundUser.username = username;
+  foundUser.role = role;
+  const errors = await validate(foundUser);
   if (errors.length > 0) {
     res.status(400).send(errors);
     return;
@@ -94,7 +92,7 @@ static editUser = async (req: Request, res: Response) => {
 
   //Try to safe, if fails, that means username already in use
   try {
-    await userRepository.save(user);
+    await userRepository.save(foundUser);
   } catch (e) {
     res.status(409).send("username already in use");
     return;
@@ -107,10 +105,10 @@ static deleteUser = async (req: Request, res: Response) => {
   //Get the ID from the url
   const id = req.params.id;
 
-  const userRepository = getRepository(User);
-  let user: User;
+  const userRepository = getRepository(user);
+  let foundUser: user;
   try {
-    user = await userRepository.findOneOrFail(id);
+    foundUser = await userRepository.findOneOrFail(id);
   } catch (error) {
     res.status(404).send("User not found");
     return;

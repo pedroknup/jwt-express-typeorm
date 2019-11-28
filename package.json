@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "Awesome project developed with TypeORM.",
   "devDependencies": {
-    "ts-node": "3.3.0",
     "@types/node": "^8.0.29",
+    "ts-node": "3.3.0",
+    "typeorm-model-generator": "^0.3.5",
     "typescript": "2.5.2"
   },
   "dependencies": {
@@ -21,7 +22,6 @@
     "helmet": "^3.15.0",
     "jsonwebtoken": "^8.4.0",
     "reflect-metadata": "^0.1.10",
-    "sqlite3": "^4.0.3",
     "ts-node-dev": "^1.0.0-pre.32",
     "typeorm": "0.2.12"
   },
@@ -29,6 +29,7 @@
     "tsc": "tsc",
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "prod": "tsc && node ./build/app.js",
+    "generate-models" : "npx typeorm-model-generator -h localhost -d pk-boilerplate -p 3307 -u root -x 123123 -e mysql -o src && ts-node ./scripts/post-generated-models.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
   }
 }
