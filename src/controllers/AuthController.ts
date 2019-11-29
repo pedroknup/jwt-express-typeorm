@@ -72,7 +72,19 @@ class AuthController {
       }
       if (newUser) {
         //Add new user
+        // TODO: Get user name through social login 
+        newUser = new user();
+        newUser.email = email;
+       // newUser.firstName = firstName;
+       // newUser.lastName = lastName;
+        newUser.password = password;
 
+        //Validade if the parameters are ok
+        const errors = await validate(newUser);
+        if (errors.length > 0) {
+          res.status(400).send(errors);
+          return;
+        }
         foundUser = newUser;
       }
     }
@@ -125,6 +137,50 @@ class AuthController {
     userRepository.save(foundUser);
 
     res.status(204).send();
+  };
+
+  static signUp = async (req: Request, res: Response) => {
+    //Get parameters from the body
+    let { email, password, firstName, lastName } = req.body;
+    let newUser = new user();
+    newUser.email = email;
+    newUser.firstName = firstName;
+    newUser.lastName = lastName;
+    newUser.password = password;
+
+    //Validade if the parameters are ok
+    const errors = await validate(newUser);
+    if (errors.length > 0) {
+      res.status(400).send(errors);
+      return;
+    }
+
+    //Hash the password, to securely store on DB
+    newUser.password = hashPassword(password);
+
+    //Try to save. If fails, the username is already in use
+    try {
+      await UserService.addUser(newUser);
+    } catch (e) {
+      res.status(409).send("username already in use");
+      return;
+    }
+
+    //Sing JWT, valid for 24 hours
+    const token = jwt.sign(
+      {
+        userId: newUser.id,
+        email: newUser.email
+      },
+      config.jwtSecret,
+      { expiresIn: "24" }
+    );
+
+    //If all ok, send 201 response
+    res.status(201).send({
+      user: newUser,
+      token
+    });
   };
 }
 export default AuthController;

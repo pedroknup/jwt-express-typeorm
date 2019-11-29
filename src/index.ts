@@ -12,6 +12,32 @@ createConnection()
     // Create a new express application instance
     const app = express();
 
+    const expressSwagger = require("express-swagger-generator")(app);
+    let options = {
+      swaggerDefinition: {
+        info: {
+          description: "NodeJS + ExpressJS + TypeScript + TypeORM + Swagger",
+          title: "PK-Boilerplate",
+          version: "1.0.0"
+        },
+        host: "localhost:3001",
+        basePath: "",
+        produces: ["application/json", "application/xml"],
+        schemes: ["http"],
+        securityDefinitions: {
+          JWT: {
+            type: "apiKey",
+            in: "header",
+            name: "Authorization",
+            description: ""
+          }
+        }
+      },
+      basedir: __dirname, //app absolute path
+      files: ["./routes/*.ts"] //Path to the API handle folder
+    };
+    expressSwagger(options);
+
     // Call midlewares
     app.use(cors());
     app.use(helmet());

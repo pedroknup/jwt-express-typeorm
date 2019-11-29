@@ -4,6 +4,7 @@
   "description": "Awesome project developed with TypeORM.",
   "devDependencies": {
     "@types/node": "^8.0.29",
+    "express-swagger-generator": "^1.1.15",
     "ts-node": "3.3.0",
     "typeorm-model-generator": "^0.3.5",
     "typescript": "2.5.2"
@@ -29,7 +30,7 @@
     "tsc": "tsc",
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "prod": "tsc && node ./build/app.js",
-    "generate-models" : "npx typeorm-model-generator -h localhost -d pk-boilerplate -p 3307 -u root -x 123123 -e mysql -o src && ts-node ./scripts/post-generated-models.ts",
+    "generate-models": "npx typeorm-model-generator -h localhost -d pk-boilerplate -p 3307 -u root -x 123123 -e mysql -o src && ts-node ./scripts/post-generated-models.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
   }
 }

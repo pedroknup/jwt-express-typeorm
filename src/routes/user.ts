@@ -16,7 +16,7 @@ import { Router } from "express";
   );
 
   //Create a new user
-  router.post("/", [], UserController.newUser);
+  // router.post("/", [], UserController.);
 
   //Edit one user
   router.patch(
