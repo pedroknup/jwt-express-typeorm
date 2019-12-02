@@ -31,36 +31,7 @@ class UserController {
     }
   };
 
-  static newUser = async (req: Request, res: Response) => {
-    //Get parameters from the body
-    let { email, password, role } = req.body;
-    let newUser = new user();
-    newUser.email = email;
-    newUser.password = password;
-    newUser.role = role;
-
-    //Validade if the parameters are ok
-    const errors = await validate(newUser);
-    if (errors.length > 0) {
-      res.status(400).send(errors);
-      return;
-    }
-
-    //Hash the password, to securely store on DB
-    newUser.password = hashPassword(password);
-
-    //Try to save. If fails, the username is already in use
-    const userRepository = getRepository(user);
-    try {
-      await userRepository.save(newUser);
-    } catch (e) {
-      res.status(409).send("username already in use");
-      return;
-    }
-
-    //If all ok, send 201 response
-    res.status(201).send("User created");
-  };
+  
 
   static editUser = async (req: Request, res: Response) => {
     //Get the ID from the url
